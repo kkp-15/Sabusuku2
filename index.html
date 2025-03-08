@@ -157,7 +157,9 @@
                 pieHole: 0.4,
                 slices: {
                     0: { offset: 0.1 },  // 少し浮かせる
-                }
+                },
+                is3D: false, // 3D表示を無効
+                pieSliceText: 'percentage' // パーセント表示
             };
 
             const chart = new google.visualization.PieChart(document.getElementById("typeChart"));
@@ -177,8 +179,11 @@
                 pieHole: 0.4,
                 slices: {
                     0: { offset: 0.1 },  // 少し浮かせる
-                }
+                },
+                is3D: false, // 3D表示を無効
+                pieSliceText: 'percentage' // パーセント表示
             };
+
             const chart = new google.visualization.PieChart(document.getElementById("serviceChart"));
             chart.draw(data, options);
         }

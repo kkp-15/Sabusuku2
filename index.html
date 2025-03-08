@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>サブスク管理</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -13,13 +12,7 @@
         input, select { padding: 5px; margin: 5px; width: 90%; max-width: 200px; }
         button { padding: 5px 10px; cursor: pointer; }
         .total { font-size: 1.5em; font-weight: bold; margin-top: 10px; }
-        .chart-container { 
-            display: flex; 
-            flex-direction: column; /* スマホでは縦並び */
-            align-items: center; 
-            width: 100%;
-        }
-        .chart-container div { width: 100%; max-width: 400px; }
+        .percentage { font-size: 1.2em; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -55,10 +48,9 @@
         <tbody id="subscription-list"></tbody>
     </table>
 
-    <!-- グラフ表示 -->
-    <div class="chart-container">
-        <div id="typeChart"></div>
-        <div id="serviceChart"></div>
+    <!-- %表示 -->
+    <div class="percentage" id="percentage-info">
+        サービスの割合: <span id="percentage">0%</span>
     </div>
 
     <script>
@@ -71,6 +63,7 @@
         function updateTable() {
             const list = document.getElementById("subscription-list");
             const yearlyTotalEl = document.getElementById("yearly-total");
+            const percentageInfo = document.getElementById("percentage");
             list.innerHTML = "";
 
             let yearlyTotal = 0;
@@ -98,7 +91,9 @@
             yearlyTotalEl.textContent = formatNumber(yearlyTotal);
             localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
 
-            drawCharts(typeCounts, serviceTotals);
+            // %表示の計算
+            const servicePercentage = calculateServicePercentage(serviceTotals, yearlyTotal);
+            percentageInfo.textContent = `サービスの割合: ${servicePercentage.toFixed(2)}%`;
         }
 
         function addSubscription() {
@@ -138,54 +133,12 @@
             link.click();
         }
 
-        function drawCharts(typeCounts, serviceTotals) {
-            google.charts.load("current", { packages: ["corechart"], callback: function() {
-                drawTypeChart(typeCounts);
-                drawServiceChart(serviceTotals);
-            }});
-        }
-
-        function drawTypeChart(typeCounts) {
-            const data = google.visualization.arrayToDataTable([
-                ["タイプ", "金額"],
-                ["月額", typeCounts["月額"]],
-                ["年額", typeCounts["年額"]]
-            ]);
-
-            const options = {
-                title: "月額 vs 年額",
-                pieHole: 0.4,
-                slices: {
-                    0: { offset: 0.1 },  // 少し浮かせる
-                },
-                is3D: false, // 3D表示を無効
-                pieSliceText: 'percentage' // パーセント表示
-            };
-
-            const chart = new google.visualization.PieChart(document.getElementById("typeChart"));
-            chart.draw(data, options);
-        }
-
-        function drawServiceChart(serviceTotals) {
-            const dataArray = [["サービス", "金額"]];
-            for (let [service, total] of Object.entries(serviceTotals)) {
-                dataArray.push([service, total]);
+        function calculateServicePercentage(serviceTotals, yearlyTotal) {
+            let total = 0;
+            for (let totalAmount of Object.values(serviceTotals)) {
+                total += totalAmount;
             }
-            if (dataArray.length === 1) dataArray.push(["データなし", 1]);
-
-            const data = google.visualization.arrayToDataTable(dataArray);
-            const options = {
-                title: "年間支出内訳",
-                pieHole: 0.4,
-                slices: {
-                    0: { offset: 0.1 },  // 少し浮かせる
-                },
-                is3D: false, // 3D表示を無効
-                pieSliceText: 'percentage' // パーセント表示
-            };
-
-            const chart = new google.visualization.PieChart(document.getElementById("serviceChart"));
-            chart.draw(data, options);
+            return (total / yearlyTotal) * 100;
         }
 
         updateTable();

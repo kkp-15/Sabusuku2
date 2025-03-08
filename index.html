@@ -157,6 +157,7 @@
         }
 
         function drawServiceChart(serviceTotals) {
+            // サービス名と金額を正しく表示
             const dataArray = [["サービス", "金額"]];
             for (let [service, total] of Object.entries(serviceTotals)) {
                 dataArray.push([service, total]);

@@ -12,7 +12,6 @@
         input, select { padding: 5px; margin: 5px; width: 90%; max-width: 200px; }
         button { padding: 5px 10px; cursor: pointer; }
         .total { font-size: 1.5em; font-weight: bold; margin-top: 10px; }
-        .percentage { font-size: 1.2em; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -48,11 +47,6 @@
         <tbody id="subscription-list"></tbody>
     </table>
 
-    <!-- %表示 -->
-    <div class="percentage" id="percentage-info">
-        サービスの割合: <span id="percentage">0%</span>
-    </div>
-
     <script>
         let subscriptions = JSON.parse(localStorage.getItem("subscriptions")) || [];
 
@@ -63,12 +57,9 @@
         function updateTable() {
             const list = document.getElementById("subscription-list");
             const yearlyTotalEl = document.getElementById("yearly-total");
-            const percentageInfo = document.getElementById("percentage");
             list.innerHTML = "";
 
             let yearlyTotal = 0;
-            let typeCounts = { "月額": 0, "年額": 0 };
-            let serviceTotals = {};
 
             subscriptions.forEach((sub, index) => {
                 const row = document.createElement("tr");
@@ -83,17 +74,10 @@
 
                 let yearlyAmount = (sub.type === "月額") ? sub.price * 12 : sub.price;
                 yearlyTotal += yearlyAmount;
-
-                typeCounts[sub.type] += yearlyAmount;
-                serviceTotals[sub.service] = (serviceTotals[sub.service] || 0) + yearlyAmount;
             });
 
             yearlyTotalEl.textContent = formatNumber(yearlyTotal);
             localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
-
-            // %表示の計算
-            const servicePercentage = calculateServicePercentage(serviceTotals, yearlyTotal);
-            percentageInfo.textContent = `サービスの割合: ${servicePercentage.toFixed(2)}%`;
         }
 
         function addSubscription() {
@@ -131,14 +115,6 @@
             link.href = URL.createObjectURL(blob);
             link.download = "subscriptions.csv";
             link.click();
-        }
-
-        function calculateServicePercentage(serviceTotals, yearlyTotal) {
-            let total = 0;
-            for (let totalAmount of Object.values(serviceTotals)) {
-                total += totalAmount;
-            }
-            return (total / yearlyTotal) * 100;
         }
 
         updateTable();

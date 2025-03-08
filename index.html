@@ -152,8 +152,16 @@
                 ["年額", typeCounts["年額"]]
             ]);
 
-            const options = { title: "月額 vs 年額", pieHole: 0.4 };
-            new google.visualization.PieChart(document.getElementById("typeChart")).draw(data, options);
+            const options = {
+                title: "月額 vs 年額",
+                pieHole: 0.4,
+                slices: {
+                    0: { offset: 0.1 },  // 少し浮かせる
+                }
+            };
+
+            const chart = new google.visualization.PieChart(document.getElementById("typeChart"));
+            chart.draw(data, options);
         }
 
         function drawServiceChart(serviceTotals) {
@@ -171,7 +179,8 @@
                     0: { offset: 0.1 },  // 少し浮かせる
                 }
             };
-            new google.visualization.PieChart(document.getElementById("serviceChart")).draw(data, options);
+            const chart = new google.visualization.PieChart(document.getElementById("serviceChart"));
+            chart.draw(data, options);
         }
 
         updateTable();

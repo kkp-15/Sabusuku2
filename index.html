@@ -157,7 +157,6 @@
         }
 
         function drawServiceChart(serviceTotals) {
-            // サービス名と金額を正しく表示
             const dataArray = [["サービス", "金額"]];
             for (let [service, total] of Object.entries(serviceTotals)) {
                 dataArray.push([service, total]);
@@ -165,7 +164,13 @@
             if (dataArray.length === 1) dataArray.push(["データなし", 1]);
 
             const data = google.visualization.arrayToDataTable(dataArray);
-            const options = { title: "年間支出内訳", pieHole: 0.4 };
+            const options = {
+                title: "年間支出内訳",
+                pieHole: 0.4,
+                slices: {
+                    0: { offset: 0.1 },  // 少し浮かせる
+                }
+            };
             new google.visualization.PieChart(document.getElementById("serviceChart")).draw(data, options);
         }
 
